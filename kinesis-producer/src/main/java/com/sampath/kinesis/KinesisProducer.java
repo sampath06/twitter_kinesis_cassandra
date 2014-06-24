@@ -1,22 +1,15 @@
 package com.sampath.kinesis;
 
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
-import com.amazonaws.services.kinesis.model.CreateStreamRequest;
-import com.amazonaws.services.kinesis.model.DeleteStreamRequest;
-import com.amazonaws.services.kinesis.model.DescribeStreamRequest;
-import com.amazonaws.services.kinesis.model.DescribeStreamResult;
-import com.amazonaws.services.kinesis.model.ListStreamsRequest;
-import com.amazonaws.services.kinesis.model.ListStreamsResult;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
 
@@ -35,10 +28,12 @@ public class KinesisProducer {
 	 *      the credentials file in your source directory.
 	 */
 
+	final String myStreamName = "streaming_poc";
 	static AmazonKinesisClient kinesisClient;
-	private static final Log LOG = LogFactory.getLog(KinesisProducer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KinesisProducer.class);
+	private static Random random = new Random();
 
-	private static void init() throws Exception {
+	public KinesisProducer() {
 
 		/*
 		 * The ProfileCredentialsProvider will return your [default]
@@ -58,24 +53,18 @@ public class KinesisProducer {
 
 		kinesisClient = new AmazonKinesisClient(credentials);
 	}
-
-	public static void main(String[] args) throws Exception {
-		init();
-
-		final String myStreamName = "streaming_poc";
-
+	
+	public PutRecordResult produce(String stream) {
 		LOG.info("Putting records in stream : " + myStreamName);
-		// Write 10 records to the stream
-		for (int j = 10; j < 20; j++) {
 			PutRecordRequest putRecordRequest = new PutRecordRequest();
 			putRecordRequest.setStreamName(myStreamName);
-			putRecordRequest.setData(ByteBuffer.wrap(String.format("testData-%d", j).getBytes()));
-			putRecordRequest.setPartitionKey(String.format("partitionKey-%d", j));
+			putRecordRequest.setData(ByteBuffer.wrap(stream.getBytes()));
+			putRecordRequest.setPartitionKey("partition" + random.nextLong());
 			PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
 			System.out.println("Successfully putrecord, partition key : " + putRecordRequest.getPartitionKey()
 					+ ", ShardID : " + putRecordResult.getShardId());
-		}
 
+			return putRecordResult;
 	}
 }
 
