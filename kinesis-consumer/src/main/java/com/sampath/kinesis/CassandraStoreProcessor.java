@@ -23,6 +23,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import twitter4j.Status;
+import twitter4j.json.DataObjectFactory;
+
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ThrottlingException;
@@ -30,6 +33,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
+import com.sampath.cassandra.CassandraClient;
 
 /**
  *
@@ -48,6 +52,7 @@ public class CassandraStoreProcessor implements IRecordProcessor {
     private long nextCheckpointTimeInMillis;
     
     private final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+    private final CassandraClient client = new CassandraClient();
     
     /**
      * Constructor.
@@ -94,6 +99,8 @@ public class CassandraStoreProcessor implements IRecordProcessor {
                     data = decoder.decode(record.getData()).toString();
                     LOG.info(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
                     System.out.println(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
+                    Status tweet = DataObjectFactory.createStatus(data);
+                    client.insert("" + tweet.getId(), data);
 		    //
                     // Logic to process record goes here.
                     //
