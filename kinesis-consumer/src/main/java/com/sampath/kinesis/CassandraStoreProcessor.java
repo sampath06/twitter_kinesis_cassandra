@@ -97,10 +97,12 @@ public class CassandraStoreProcessor implements IRecordProcessor {
                 try {
                     // For this app, we interpret the payload as UTF-8 chars.
                     data = decoder.decode(record.getData()).toString();
-                    LOG.info(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
-                    System.out.println(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
+                    LOG.debug(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
+			try {
                     Status tweet = DataObjectFactory.createStatus(data);
-                    client.insert("" + tweet.getId(), data);
+                    client.insert("tweets", "tweet_id", "" + tweet.getId(), "tweet", data);
+} catch (Exception e) {
+	}
 		    //
                     // Logic to process record goes here.
                     //

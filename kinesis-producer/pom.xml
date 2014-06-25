@@ -52,7 +52,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.sampath.kinesis.KinesisProducer</mainClass>
+							<mainClass>com.sampath.kinesis.App</mainClass>
 							<classpathPrefix>dependency-jars/</classpathPrefix>
 						</manifest>
 					</archive>
