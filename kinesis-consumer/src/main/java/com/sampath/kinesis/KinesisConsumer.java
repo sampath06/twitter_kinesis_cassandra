@@ -32,6 +32,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorF
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.InitialPositionInStream;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
+import com.sampath.metrics.HazelCastMetricsFactory;
 
 
 /**
@@ -87,7 +88,9 @@ public final class KinesisConsumer {
 
 
         IRecordProcessorFactory recordProcessorFactory = new CassandraStoreProcessorFactory();
-         Worker worker = new Worker(recordProcessorFactory, kinesisClientLibConfiguration);
+        String workerId = kinesisClientLibConfiguration.getWorkerIdentifier();
+        
+         Worker worker = new Worker(recordProcessorFactory, kinesisClientLibConfiguration, new HazelCastMetricsFactory(workerId));
 
         int exitCode = 0;
         try {
