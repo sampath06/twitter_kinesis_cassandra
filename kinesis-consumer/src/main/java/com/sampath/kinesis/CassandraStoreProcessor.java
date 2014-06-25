@@ -52,7 +52,7 @@ public class CassandraStoreProcessor implements IRecordProcessor {
     private long nextCheckpointTimeInMillis;
     
     private final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-//    private final CassandraClient client = new CassandraClient();
+    private final CassandraClient client = new CassandraClient();
     
     /**
      * Constructor.
@@ -100,7 +100,7 @@ public class CassandraStoreProcessor implements IRecordProcessor {
                     LOG.debug(record.getSequenceNumber() + ", " + record.getPartitionKey() + ", " + data);
 			try {
                     Status tweet = DataObjectFactory.createStatus(data);
-//                    client.insert("tweets", "tweet_id", "" + tweet.getId(), "tweet", data);
+                    client.insert("tweets", "tweet_id", "" + tweet.getId(), "tweet", data);
 } catch (Exception e) {
 	}
 		    //
